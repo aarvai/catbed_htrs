@@ -202,3 +202,48 @@ def append_to_array(a, pos=-1, val=0):
     elif pos==-1:
         out = np.concatenate([a, val_a])
     return out
+    
+def remove_therm_dropouts(tlm):
+    """Attempts to remove MUPS-1 and MUPS-2 thermistor dropouts from a 
+    telemetry data set acquired by:
+        fetch.Msidset(['PM1THV1T','PM1THV2T','PM2THV1T','PM2THV2T'],
+                      starttime, endtime)
+
+    The timestamps for each msid must be the same.  This can be accomplished
+    by using the '5min' or 'daily' statistics or by using the .interpolate
+    function.
+    
+    Returns the same telemetry set with intervals removed for the following 
+    conditions:
+        -MUPS-1A & MUPS-1B temps vary by > 10 deg F
+        -MUPS-2A & MUPS-2B temps vary by > 10 deg F
+        -MUPS-1B & MUPS-2B temps vary by > 30 deg F
+        
+    As a repurcussion, this algorithm will remove some "valid" telemetry 
+    during the rare heater cycles in early mission.
+    
+    Note that temperatures will also naturally vary around momentum unloads 
+    due to heat soakback, so it is recommended to exclude unloads from the 
+    data set (or accept that dropout false-positives will occur during these 
+    timeframes).   
+    
+    Note that MUPS-1B is the only thermistor in this set that does not 
+    currently experience dropouts.    
+    """
+    msids = ['PM1THV1T', 'PM1THV2T', 'PM2THV1T', 'PM2THV2T']
+    mups1a = tlm['PM1THV1T'].vals
+    mups1b = tlm['PM1THV2T'].vals
+    mups2a = tlm['PM2THV1T'].vals
+    mups2b = tlm['PM2THV2T'].vals
+    t = tlm['PM1THV1T'].times
+    for msid in msids:
+        if np.any(tlm[msid].times != t):
+            raise inputError('Time sets do not match')
+    dropout_1 = np.abs(mups1a - mups1b) > 10
+    dropout_2 = np.abs(mups2a - mups2b) > 10
+    dropout_b = np.abs(mups1b - mups2b) > 30   
+    dropouts = dropout_1 | dropout_2 | dropout_b 
+    for msid in msids:
+        tlm[msid].times = tlm[msid].times[~dropouts]
+        tlm[msid].vals = tlm[msid].vals[~dropouts]
+    return tlm
