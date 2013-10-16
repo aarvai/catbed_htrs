@@ -1,7 +1,12 @@
-
 from kadi import events
+from Ska.engarchive import fetch_eng as fetch
+from Ska.Matplotlib import plot_cxctime
 
 from utilities import find_closest, find_last_before, find_first_after, same_limits
+
+rcParams_orig = rcParams.copy()
+rcParams['lines.markersize'] = 3
+rcParams['axes.grid'] = True
 
 close('all')
 
@@ -11,14 +16,24 @@ durs = eclipses_t2 - eclipses_t1
 
 marker_i = 0
 
+# Cache telemetry values between runs (use "run -i ...")
+if 'msid_cache' not in globals():
+    msid_cache = {}
+
 for thr in range(1,5):
 
     for ab, c in zip(range(1,3), ('b','r')):
 
         temp = 'PM' + str(thr) + 'THV' + str(ab) + 'T'
-        x = fetch.Msid(temp, '2000:001')
 
-        x.select_intervals(events.eclipses)
+        if temp not in msid_cache:
+            print 'Fetching {}'.format(temp)
+            x = fetch.Msid(temp, '2000:001')
+            x.select_intervals(events.eclipses)
+            msid_cache[temp] = x
+        else:
+            print 'Getting {} from cache'.format(temp)
+            x = msid_cache[temp]
 
         eclipses_i1 = find_first_after(eclipses_t1, x.times)
         eclipses_i2 = find_last_before(eclipses_t2, x.times)
@@ -42,7 +57,7 @@ for thr in range(1,5):
         title('Change in MUPS-' + str(thr) + 'Temps During Eclipses')
         xlabel('Time into Eclipse [sec]')
         ylabel('deg F')
-          
+
         figure(3)
         subplot(2,2,thr)
         plot_cxctime(eclipses_t1, cooling_rates, c + '*', label=temp, mew=0)
@@ -64,14 +79,22 @@ for thr in range(1,5):
             marker = ['co','cs', 'mo', 'ms']
 
             figure(5)
-            plot_cxctime(eclipses_t1, cooling_rates, marker[marker_i], label=temp, mew=0)
+
+            # Correct cooling rates to a common starting temperature of
+            # 130 F.  The correction is based on a rough eyeball fitting of
+            # Figure 4.  Exact value could be improved and might depend on thr.
+            starting_temps = x.vals[eclipses_i1]
+            cooling_rates_corr = cooling_rates - (130 - starting_temps) * 10. / 30.
+
+            plot_cxctime(eclipses_t1, cooling_rates_corr, marker[marker_i], label=temp, mew=0)
             title('MUPS-1 and MUPS-2 Cooling Rates During Eclipses')
             ylabel('Cooling Rate [deg F/hr]')
             ylim([-100, 20])
+            grid()
             legend(loc='lower left')
 
             figure(6)
-            plot(cooling_rates, marker[marker_i], label=temp, mew=0)
+            plot(cooling_rates_corr, marker[marker_i], label=temp, mew=0)
             xlabel('Eclipse Number Since 2000:001')
             title('MUPS-1 and MUPS-2 Cooling Rates During Eclipses')
             ylabel('Cooling Rate [deg F/hr]')
@@ -90,5 +113,6 @@ for fig in range(1, 5):
     if fig < 4:
         tight_layout()      
 
-    
-    
+show()
+
+rcParams.update(rcParams_orig)
