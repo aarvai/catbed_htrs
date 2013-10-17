@@ -10,11 +10,12 @@ rcParams['lines.markersize'] = 3
 rcParams['axes.grid'] = True
 
 tstart = '2000:001'
+min_ecl = 60*30 #sec
 
 close('all')
 
-eclipses_t1 = array(events.eclipses.table['tstart'])
-eclipses_t2 = array(events.eclipses.table['tstop'])
+eclipses_t1 = array(events.eclipses.filter(dur__gt=min_ecl).table['tstart'])
+eclipses_t2 = array(events.eclipses.filter(dur__gt=min_ecl).table['tstop'])
 durs = eclipses_t2 - eclipses_t1
 msids = ['PM1THV1T','PM1THV2T','PM2THV1T','PM2THV2T',
          'PM3THV1T','PM3THV2T','PM4THV1T','PM4THV2T']
@@ -74,7 +75,7 @@ for thr in range(1,5):
         figure(3)
         subplot(2,2,thr)
         plot_cxctime(eclipses_t1[ok], cooling_rates, c + '*', label=temp, mew=0)
-        title('MUPS-' + str(thr) + ' Cooling Rates During Eclipses')
+        title('MUPS-' + str(thr) + ' Uncorrected Cooling Rates During Eclipses')
         ylabel('Cooling Rate [deg F/hr]')
         ylim([-100, 20])
         legend(loc='best')
@@ -82,7 +83,7 @@ for thr in range(1,5):
         figure(4)
         subplot(2,2,thr)
         plot(x.vals[eclipses_i1], cooling_rates, c + '*', label=temp, mew=0)
-        title('MUPS-' + str(thr) + ' Cooling Rates During Eclipses vs Starting Temp')
+        title('MUPS-' + str(thr) + ' Uncorrected Cooling Rates During Eclipses vs Starting Temp')
         ylabel('Cooling Rate [deg F/hr]')
         xlabel('Eclipse Starting Temp [deg F]')
         ylim([-100, 20])
@@ -100,17 +101,17 @@ for thr in range(1,5):
             cooling_rates_corr = cooling_rates - (130 - starting_temps) * 10. / 30.
 
             plot_cxctime(eclipses_t1[ok], cooling_rates_corr, marker[marker_i], label=temp, mew=0)
-            title('MUPS-1 and MUPS-2 Cooling Rates During Eclipses')
-            ylabel('Cooling Rate [deg F/hr] \n (Corrected for Eclipse Starting Temp)')
+            title('MUPS-1 and MUPS-2 Cooling Rates During Eclipses (duration > 30 min)')
+            ylabel('Cooling Rate [deg F/hr] \n Corrected for Eclipse Starting Temp')
             ylim([-100, 20])
             grid()
             legend(loc='lower left')
 
             figure(6)
             plot(cooling_rates_corr, marker[marker_i], label=temp, mew=0)
-            xlabel('Eclipse Number Since 2000:001')
-            title('MUPS-1 and MUPS-2 Cooling Rates During Eclipses')
-            ylabel('Cooling Rate [deg F/hr] \n (Corrected for Eclipse Starting Temp)')
+            xlabel('Eclipse Number Since 2000:001 (duration > 30 min)')
+            title('MUPS-1 and MUPS-2 Cooling Rates During Eclipses (duration > 30 min)')
+            ylabel('Cooling Rate [deg F/hr] \n Corrected for Eclipse Starting Temp ')
             ylim([-100, 20])
             legend(loc='lower left')
 
