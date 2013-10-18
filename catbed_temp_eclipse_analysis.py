@@ -76,7 +76,7 @@ for thr in range(1,5):
         subplot(2,2,thr)
         plot_cxctime(eclipses_t1[ok], cooling_rates, c + '*', label=temp, mew=0)
         title('MUPS-' + str(thr) + ' Uncorrected Cooling Rates During Eclipses')
-        ylabel('Cooling Rate [deg F/hr]')
+        ylabel('Uncorrected Cooling Rate [deg F/hr]')
         ylim([-100, 20])
         legend(loc='best')
 
