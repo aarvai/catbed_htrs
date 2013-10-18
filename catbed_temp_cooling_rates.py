@@ -5,7 +5,7 @@ from utilities import find_closest, find_last_before, find_first_after, same_lim
 
 close('all')
 
-tstart = '2013:001'
+tstart = '2000:001'
 pitch_bin_min = 156
 pitch_bin_max = 166
 
@@ -31,29 +31,29 @@ for thr in range(1,3):
     for ab, c in zip(range(1,3), ('b','r')):
 
         temp = 'PM' + str(thr) + 'THV' + str(ab) + 'T'
-        x = fetch.Msid(temp, '2000:001')
+        x = fetch.Msid(temp, '2000:001', stat='5min')
 
         i1 = find_first_after(t1, x.times)
         i2 = find_last_before(t2, x.times)
         
         cooling_rates = (x.vals[i2] - x.vals[i1]) * 3600 / durs
                 
-        figure(1)
-        subplot(1,2,thr)
-        zipvals = zip(i1, i2)
-        for i1i, i2i in zipvals:
-            plot_cxctime(x.times[i1i:i2i], x.vals[i1i:i2i], c+'.', label=temp)
-        title('MUPS-' + str(thr) + ' Valve Temps during Dwells at 156 - 166 Pitch')
-        ylabel('deg F')
+        #figure(1)
+        #subplot(1,2,thr)
+        #zipvals = zip(i1, i2)
+        #for i1i, i2i in zipvals:
+        #    plot_cxctime(x.times[i1i:i2i], x.vals[i1i:i2i], c+'.', label=temp)
+        #title('MUPS-' + str(thr) + ' Valve Temps during Dwells at 156 - 166 Pitch')
+        #ylabel('deg F')
 
-        figure(2)
-        subplot(1,2,thr)
-        zipvals = zip(i1, i2)
-        for i1i, i2i in zipvals:
-            plot(x.times[i1i:i2i] - x.times[i1i], x.vals[i1i:i2i] - x.vals[i1i], c, label=temp)
-        title('Change in MUPS-' + str(thr) + 'Temps During Dwells at 156 - 166 Pitch')
-        xlabel('Time into Dwell [sec]')
-        ylabel('deg F')
+        #figure(2)
+        #subplot(1,2,thr)
+        #zipvals = zip(i1, i2)
+        #for i1i, i2i in zipvals:
+        #    plot(x.times[i1i:i2i] - x.times[i1i], x.vals[i1i:i2i] - x.vals[i1i], c, label=temp)
+        #title('Change in MUPS-' + str(thr) + 'Temps During Dwells at 156 - 166 Pitch')
+        #xlabel('Time into Dwell [sec]')
+        #ylabel('deg F')
           
         figure(3)
         subplot(1,2,thr)
