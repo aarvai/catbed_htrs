@@ -100,14 +100,8 @@ def find_last_before(a, b):
     array b that are closest without going over the values of array a.
     (Bob Barker rules.  Assumes b is sorted by magnitude.)
     """
-    a = np.atleast_1d(np.array(a))
-    b = np.atleast_1d(np.array(b))
-    out = np.zeros(len(a), dtype='int32')
-    for i in range(len(a)):
-        out_i = np.argmin(abs(b - a[i]))
-        if b[out_i] > a[i]:
-            out_i = out_i - 1
-        out[i] = out_i
+    out = np.searchsorted(b,a,side='left') - 1
+    out[out==-1] = 0
     return out    
      
 def find_first_after(a, b):
@@ -115,14 +109,7 @@ def find_first_after(a, b):
     array b that are closest without being less than the values of array a.
     (Opposite of Bob Barker rules.  Assumes b is sorted by magnitude.)
     """
-    a = np.atleast_1d(np.array(a))
-    b = np.atleast_1d(np.array(b))
-    out = np.zeros(len(a), dtype='int32')
-    for i in range(len(a)):
-        out_i = np.argmin(abs(b - a[i]))
-        if b[out_i] < a[i]:
-            out_i = out_i + 1
-        out[i] = out_i
+    out = np.searchsorted(b,a,side='right')
     return out  
     
 def append_rss(A):
