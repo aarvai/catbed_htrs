@@ -117,10 +117,11 @@ for thr in range(1,3):
         
 for fig in range(1, 4):
     figure(fig)
-    subplot(121)
-    axis1 = axis()
-    subplot(122)
-    axis(axis1)     
+    same_limits((121,122))
+#    subplot(121)
+#    axis1 = axis()
+#    subplot(122)
+#    axis(axis1)     
 
     
     
