@@ -30,6 +30,7 @@ for thr in range(1,5):
         plot_cxctime(dates, htr_freq, c, label=temp)
         title('MUPS-' + str(thr) + ' Heater Cycling Frequency')
         legend(loc='best')
+        ylabel('Cycles per Month')
 
 same_limits((221, 222))
 same_limits((223, 224))
