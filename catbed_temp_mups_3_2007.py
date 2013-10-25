@@ -21,7 +21,7 @@ for ab in range(1,3):
     ylim([45,115])
     old_on = array([old_setpoints[ab-1][0], old_setpoints[ab-1][0]])
     old_off = array([old_setpoints[ab-1][1], old_setpoints[ab-1][1]])
-    plot(xlim(), old_on, 'b:', label='Old Set Points')
+    plot(xlim(), old_on, 'b:', label='Pre-Event Set Points')
     plot(xlim(), old_off, 'b:')
     legend()
     
