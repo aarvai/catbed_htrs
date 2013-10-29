@@ -10,6 +10,7 @@ for thr in range(1, 5):
     t1 = 'PM' + str(thr) + 'THV1T'
     t2 = 'PM' + str(thr) + 'THV2T'
     x = fetch.Msidset([t1, t2],'2000:001',stat='5min')
+    #x = fetch.Msidset([t1, t2],'1999:204:00:00:00.000','2000:001:00:00:00.000',stat='5min')
     x[t1].remove_intervals(dumps)
     x[t2].remove_intervals(dumps)
     if all(x[t1].times == x[t2].times):
@@ -17,7 +18,7 @@ for thr in range(1, 5):
         
         figure(1)
         subplot(2,2,thr)
-        plot_cxctime(x[t1].times, dt, 'b.')
+        plot_cxctime(x[t1].times, dt, 'b.', alpha=.005)
         ylabel('deg F')
 	title(t1 + ' - ' + t2 + ' (Excluding Dumps)')
         ylim([-15,15])
