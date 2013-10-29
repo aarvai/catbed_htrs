@@ -1,3 +1,5 @@
+from kadi import events
+
 # Range 1
 #t_start = '2006:351:00:00:00.000'
 #t_stop = '2006:351:12:00:00.000'
@@ -7,20 +9,35 @@
 #t_stop = '2006:354:00:00:00.000'
 
 # Range 3
-t_start = '2000:001'
-t_stop = None
+#t_start = '2000:001'
+#t_stop = None
+
+# Range 2b
+t_start = '2006:220:00:00:00.000'
+t_stop = '2007:100:00:00:00.000'
 
 t_event = '2006:351:04:38:00.000'
 
-t_event_pad = DateTime(t_event).secs + 60
-old_setpoints = [[59.55,96.9],[58.32, 97.77]]
+old_range = [[59.55,96.9],[58.32, 97.77]]
 
 close('all')
 
-x = fetch.Msidset(['PM3THV1T','PM3THV2T'], t_start, t_stop, stat='5min')
-#x.interpolate(dt=32.8)
+dumps = events.dumps
+dumps.interval_pad = (10, 7200)
+
+if DateTime(t_start).secs - DateTime(t_stop).secs > 3600*24*365:
+    x = fetch.Msidset(['PM3THV1T','PM3THV2T'], t_start, t_stop, stat='5min')
+    x['PM3THV1T'].remove_intervals(dumps)
+    x['PM3THV2T'].remove_intervals(dumps)
+    dt = x['PM3THV1T'].vals - x['PM3THV2T'].midvals
+else:  
+    x = fetch.Msidset(['PM3THV1T','PM3THV2T'], t_start, t_stop)
+    x.interpolate(dt=32.8)
+    x['PM3THV1T'].remove_intervals(dumps)
+    x['PM3THV2T'].remove_intervals(dumps)
+    dt = x['PM3THV1T'].vals - x['PM3THV2T'].vals
+
 post = x['PM3THV1T'].times > DateTime(t_event).secs
-dt = x['PM3THV1T'].vals - x['PM3THV2T'].vals
 
 for ab in range(1,3):
     subplot(3,1,ab)
@@ -30,8 +47,8 @@ for ab in range(1,3):
     title(temp)
     ylabel('deg F')
     ylim([45,115])
-    old_on = array([old_setpoints[ab-1][0], old_setpoints[ab-1][0]])
-    old_off = array([old_setpoints[ab-1][1], old_setpoints[ab-1][1]])
+    old_on = array([old_range[ab-1][0], old_range[ab-1][0]])
+    old_off = array([old_range[ab-1][1], old_range[ab-1][1]])
     plot(xlim(), old_on, 'b:', label='Pre-Event Range')
     plot(xlim(), old_off, 'b:')
     legend()
