@@ -10,6 +10,9 @@ t_start = '2000:001'
 t_stop = None
 #t_stop = '2013:268'
 
+t_event = array([DateTime('2006:351:04:38:00.000').secs, 
+                 DateTime('2006:351:04:38:00.000').secs])
+
 x = fetch.Msid(temp, t_start, t_stop)
 dt = diff(x.vals)
 
@@ -41,6 +44,7 @@ on_yrs = [date[0:4] for date in on_dates]
 on_mos = [date[5:7] for date in on_dates]
 on_freq = zeros(168)
 on_time = zeros(168)
+avg_on_time = zeros(168)
 dates = zeros(168)
 i = 0
 for yr in range(2000, 2014):
@@ -50,6 +54,7 @@ for yr in range(2000, 2014):
                           for on_mo in on_mos])
         on_freq[i] = sum(yr_match & mo_match)
         on_time[i] = sum(dur[yr_match & mo_match])
+        avg_on_time[i] = mean(dur[yr_match & mo_match])
         dates[i] = DateTime(str(yr) + '-' + str(mo).zfill(2) 
                             + '-01 00:00:00.000').secs
         i = i + 1
@@ -57,31 +62,44 @@ dates_range = append(dates, DateTime('2014:001').secs)
 dc = on_time / (dates_range[1:] - dates_range[:-1])
 
 figure(1)
-plot_cxctime(t_on, dur, 'b.', alpha=1)
+plot_cxctime(t_on, dur, 'b.', alpha=.05, mew=0)
+plot_cxctime(t_event, ylim(),'r:')
 ylabel('On-Time Durations [sec]')
-title('MUPS-3 Valve Heater Cycle Durations')
+title('MUPS-3 Valve Heater On-Time Durations')
 
 figure(2)
-plot_cxctime(x.times, x.vals)
+plot_cxctime(x.times, x.vals, mew=0)
 plot_cxctime(x.times, x.vals, 'b*',mew=0)
-plot_cxctime(x.times[htr_on], x.vals[htr_on], 'c*',mew=0)
-plot_cxctime(x.times[htr_off], x.vals[htr_off], 'r*',mew=0)
+plot_cxctime(x.times[htr_on], x.vals[htr_on], 'c*',mew=0, label='Heater On')
+plot_cxctime(x.times[htr_off], x.vals[htr_off], 'r*',mew=0, label='Heater Off')
+plot_cxctime(t_event, ylim(),'r:')
+legend()
 
 figure(3)
 hist(dur, bins=100, normed=True)
 xlabel('On-Time Durations [sec]')
+title('MUPS-3 Valve Heater On-Time Durations')
 
 figure(4)
-plot_cxctime(dates, dc*100, '*')
+plot_cxctime(dates, dc*100, '*', mew=0)
+plot_cxctime(t_event, ylim(),'r:')
 title('MUPS-3 Valve Heater Duty Cycle')
-ylabel('Heater Duty Cycle by Month [%]')
+ylabel('Heater Duty Cycle by Month [%] \n (Total On-time / Total Time)')
 
 figure(5)
-plot_cxctime(dates, on_freq, '*')
+plot_cxctime(dates, on_freq, '*', mew=0)
+plot_cxctime(t_event, ylim(),'r:')
 title('MUPS-3 Valve Heater Cycling Frequency')
 ylabel('Heater Cycles per Month')
 
 figure(6)
-plot_cxctime(dates, on_time/3600, '*')
+plot_cxctime(dates, on_time/3600, '*', mew=0)
+plot_cxctime(t_event, ylim(),'r:')
 title('MUPS-3 Valve Heater On-Time')
 ylabel('Heater On-Time by Month [hrs]')
+
+figure(7)
+plot_cxctime(dates, avg_on_time/3600, '*', mew=0)
+plot_cxctime(t_event, ylim(),'r:')
+title('MUPS-3 Valve Heater Average On-Time')
+ylabel('Mean Heater On-Time by Month [hrs]')
