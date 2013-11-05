@@ -9,16 +9,22 @@ close('all')
 for thr in range(1, 5):
     t1 = 'PM' + str(thr) + 'THV1T'
     t2 = 'PM' + str(thr) + 'THV2T'
+    
     x = fetch.Msidset([t1, t2],'2000:001',stat='5min')
-    #x = fetch.Msidset([t1, t2],'1999:204:00:00:00.000','2000:001:00:00:00.000',stat='5min')
+    
+    # Hack to avoid bug where midvals aren't removed with remove_intervals
+    x[t1].vals = x[t1].midvals
+    x[t2].vals = x[t2].midvals
+    
     x[t1].remove_intervals(dumps)
     x[t2].remove_intervals(dumps)
+    
     if all(x[t1].times == x[t2].times):
         dt = x[t1].vals - x[t2].vals
         
         figure(1)
         subplot(2,2,thr)
-        plot_cxctime(x[t1].times, dt, 'b.', alpha=.005)
+        plot_cxctime(x[t1].times, dt, 'b.', alpha=.01)
         ylabel('deg F')
 	title(t1 + ' - ' + t2 + ' (Excluding Dumps)')
         ylim([-15,15])
