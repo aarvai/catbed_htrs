@@ -1,20 +1,20 @@
 from kadi import events
 
 # Range 1
-#t_start = '2006:351:00:00:00.000'
-#t_stop = '2006:351:12:00:00.000'
+t_start = '2000:001'
+t_stop = None
 
 # Range 2
+#t_start = '2006:220:00:00:00.000'
+#t_stop = '2007:100:00:00:00.000'
+
+# Range 3
 #t_start = '2006:349:00:00:00.000'
 #t_stop = '2006:354:00:00:00.000'
 
-# Range 3
-#t_start = '2000:001'
-#t_stop = None
-
-# Range 2b
-t_start = '2006:220:00:00:00.000'
-t_stop = '2007:100:00:00:00.000'
+# Range 4
+#t_start = '2006:351:00:00:00.000'
+#t_stop = '2006:351:12:00:00.000'
 
 t_event = '2006:351:04:38:00.000'
 
@@ -54,7 +54,7 @@ for ab in range(1,3):
     legend()
     
 subplot(3,1,3)
-plot_cxctime(x['PM3THV1T'].times, dt, 'b', label='Pre-event')
+plot_cxctime(x['PM3THV1T'].times[~post], dt[~post], 'b', label='Pre-event')
 plot_cxctime(x['PM3THV1T'].times[post], dt[post], 'r', label='Post-event')
 title('PM3THV1T minus PM3THV2T')
 ylabel('deg F')
